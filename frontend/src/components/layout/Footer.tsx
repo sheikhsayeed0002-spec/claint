@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { Camera, MessageCircle, Play, Send } from 'lucide-react'
 
-export function Footer() {
+export function Footer({ compact = false }: { compact?: boolean }) {
   const { t } = useTranslation()
 
   const sitemapLinks = [
@@ -28,15 +28,15 @@ export function Footer() {
   ]
 
   return (
-    <footer className="bg-navy pb-[calc(5rem+env(safe-area-inset-bottom))] text-white/70 lg:pb-0">
+    <footer className={compact ? 'bg-navy pb-8 text-white/70' : 'bg-navy pb-[calc(5rem+env(safe-area-inset-bottom))] text-white/70 lg:pb-0'}>
       <div className="container-page section-y flex flex-col gap-10 lg:flex-row lg:items-start lg:justify-between lg:gap-10">
         <div className="max-w-sm min-w-0">
           <p className="text-h2 font-display font-extrabold text-white">
-            Hopeland<span className="text-primary">.</span>
+            Hopeland Global Checkers<span className="text-primary">.</span>
           </p>
           <p className="text-body-lg mt-5 text-white/60">{t('footer.tagline')}</p>
           <p className="mt-8 text-xs text-white/40">
-            &copy; {new Date().getFullYear()} Hopeland Global Checkers
+            &copy; {new Date().getFullYear()} Hopeland Global Checkers (Draughts) Federation
           </p>
           <div className="mt-6 flex flex-wrap gap-3">
             {socials.map((s) => (

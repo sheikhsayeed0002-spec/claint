@@ -8,6 +8,7 @@ import { Footer } from '@/components/layout/Footer'
 
 export function PublicLayout() {
   const location = useLocation()
+  const hideBottomNav = /^(?:\/register|\/login|\/signup|\/account)/.test(location.pathname)
 
   return (
     <div className="flex min-h-screen min-w-0 flex-col overflow-x-clip bg-surface-white">
@@ -28,13 +29,13 @@ export function PublicLayout() {
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: -8 }}
           transition={{ duration: 0.2 }}
-          className="min-w-0 flex-1 pb-4 lg:pb-0"
+          className={hideBottomNav ? 'min-w-0 flex-1 pb-4' : 'min-w-0 flex-1 pb-4 lg:pb-0'}
         >
           <Outlet />
         </motion.main>
       </AnimatePresence>
-      <Footer />
-      <MobileBottomNav />
+      <Footer compact={hideBottomNav} />
+      {!hideBottomNav && <MobileBottomNav />}
     </div>
   )
 }

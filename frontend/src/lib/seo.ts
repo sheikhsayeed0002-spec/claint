@@ -1,5 +1,5 @@
-const SITE_NAME = 'Hopeland Global Checkers'
-const SITE_URL = 'https://www.hopelandglobalcheckers.com'
+const SITE_NAME = 'Hopeland Global Checkers (Draughts) Federation'
+const SITE_URL = 'https://hcheckers.org'
 
 export function organizationJsonLd() {
   return {

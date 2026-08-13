@@ -28,6 +28,7 @@
 
   --animate-float: float 6s ease-in-out infinite;
   --animate-marquee: marquee 32s linear infinite;
+  --animate-marquee-reverse: marquee-reverse 32s linear infinite;
 
   @keyframes float {
     0%,
@@ -45,6 +46,15 @@
     }
     to {
       transform: translateX(-50%);
+    }
+  }
+
+  @keyframes marquee-reverse {
+    from {
+      transform: translateX(-50%);
+    }
+    to {
+      transform: translateX(0);
     }
   }
 }
@@ -146,6 +156,14 @@
     display: none;
   }
 
+  .animate-sponsor-down {
+    animation: sponsor-down 24s linear infinite;
+  }
+
+  .animate-sponsor-up {
+    animation: sponsor-up 24s linear infinite;
+  }
+
   .checker-divider {
     background-image: repeating-linear-gradient(
       45deg,
@@ -157,3 +175,22 @@
   }
 
 }
+
+@keyframes sponsor-down {
+  from {
+    transform: translateY(0);
+  }
+  to {
+    transform: translateY(-50%);
+  }
+}
+
+@keyframes sponsor-up {
+  from {
+    transform: translateY(-50%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+

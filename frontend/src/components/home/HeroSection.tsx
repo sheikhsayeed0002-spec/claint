@@ -1,11 +1,15 @@
 import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { motion } from 'framer-motion'
-import { ArrowRight, PlayCircle } from 'lucide-react'
+import { ArrowRight, PlayCircle, UserRound } from 'lucide-react'
 import { Button } from '@/components/common/Button'
 import { HeroCube } from '@/components/home/HeroCube'
 import { NetworkBackground } from '@/components/home/NetworkBackground'
 import { SponsorsMarquee } from '@/components/home/SponsorsMarquee'
+import { SponsorsStaticGrid } from '@/components/home/SponsorsStaticGrid'
+import { SponsorsDualCarousel } from '@/components/home/SponsorsDualCarousel'
+import { useAuth } from '@/context/AuthContext'
+import { useRegistrantStore } from '@/store/registrantStore'
 import { fadeUp, floatY, floatYSlow, slideFromLeft, slideFromRight, staggerContainer } from '@/lib/motion'
 
 /** Top chrome ≈ announcement + sticky header; mobile also clears bottom nav. */
@@ -14,6 +18,11 @@ const HERO_MIN_H =
 
 export function HeroSection() {
   const { t } = useTranslation('home')
+  const { t: tc } = useTranslation()
+  const { isPaidPlayer } = useAuth()
+  const registrantId = useRegistrantStore((s) => s.registrantId)
+  const showProfile = isPaidPlayer || Boolean(registrantId)
+  const profileTo = isPaidPlayer ? '/account' : '/profile'
 
   return (
     <section
@@ -76,6 +85,20 @@ export function HeroSection() {
           </motion.h1>
           <motion.p
             variants={fadeUp}
+            className="mx-auto mt-3 inline-flex max-w-xl flex-col items-center gap-0.5 rounded-2xl border border-white/20 bg-white/10 px-4 py-2.5 text-center backdrop-blur-sm sm:mt-5 sm:max-w-none sm:px-5 lg:mx-0 lg:items-start lg:text-left"
+          >
+            <span className="text-[10px] font-bold tracking-[0.18em] text-primary-light uppercase sm:text-[11px]">
+              Global Checkers / Draughts Competition
+            </span>
+            <span className="text-sm font-extrabold text-white sm:text-base">
+              Atlanta, Georgia, USA
+            </span>
+            <span className="text-sm font-semibold text-white/90 sm:text-base">
+              19 July – 25 July, 2027
+            </span>
+          </motion.p>
+          <motion.p
+            variants={fadeUp}
             className="mx-auto mt-2 max-w-xl text-[0.9rem] leading-snug text-white/70 line-clamp-3 sm:mt-4 sm:max-w-2xl sm:text-body-lg sm:leading-relaxed sm:line-clamp-none lg:mx-0"
           >
             {t('hero.subtitle')}
@@ -84,13 +107,13 @@ export function HeroSection() {
             variants={slideFromLeft}
             className="mt-4 flex w-full max-w-md flex-col items-stretch gap-2 sm:mt-7 sm:max-w-none sm:flex-row sm:flex-wrap sm:items-center sm:justify-center sm:gap-4 lg:justify-start"
           >
-            <Link to="/register" className="min-w-0 sm:flex-none">
+            <Link to={showProfile ? profileTo : '/register'} className="min-w-0 sm:flex-none">
               <Button
                 size="md"
-                icon={<ArrowRight size={16} />}
+                icon={showProfile ? <UserRound size={16} /> : <ArrowRight size={16} />}
                 className="w-full px-4 py-2.5 text-sm sm:w-auto sm:px-8 sm:py-4 sm:text-lg"
               >
-                {t('hero.ctaPrimary')}
+                {showProfile ? tc('header.myProfile') : t('hero.ctaPrimary')}
               </Button>
             </Link>
             <Link to="/videos" className="min-w-0 sm:flex-none">
@@ -123,6 +146,12 @@ export function HeroSection() {
             Official partners
           </p>
           <SponsorsMarquee variant="dark" compact />
+          <div className="mt-6 sm:mt-8">
+            <SponsorsStaticGrid tone="navy" />
+          </div>
+          <div className="mt-6 w-full sm:mt-8">
+            <SponsorsDualCarousel tone="navy" />
+          </div>
         </div>
       </div>
     </section>

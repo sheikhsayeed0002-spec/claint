@@ -45,7 +45,7 @@ export function Header() {
     >
       <div className="container-page flex min-w-0 items-center justify-between gap-2 sm:gap-4">
         <Link to="/" className="min-w-0 shrink truncate text-lg font-display font-extrabold text-ink sm:text-xl md:text-h3">
-          Hopeland<span className="text-primary">.</span>
+          Hopeland<span className="hidden sm:inline"> Global Checkers</span>
         </Link>
 
         <nav className="hidden min-w-0 items-center gap-5 xl:gap-7 lg:flex">

@@ -1,9 +1,10 @@
 {
   "hero": {
-    "eyebrow": "World Championship",
+    "eyebrow": "Hopeland Global Checkers (Draughts) Federation",
     "title": "Where Every Move Writes History",
-    "subtitle": "Join thousands of players from over 120 countries competing for the Hopeland Global Checkers world title — live-streamed, fairly judged, and open to every skill level.",
+    "subtitle": "The official home of the Global Checkers / Draughts Championship — Atlanta, Georgia, USA, 19–25 July 2027. Live-streamed, fairly judged, and open to every skill level.",
     "ctaPrimary": "Register to Compete",
+    "ctaProfile": "Profile",
     "ctaSecondary": "Watch Highlights"
   }
 }

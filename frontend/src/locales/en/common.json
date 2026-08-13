@@ -8,10 +8,11 @@
     "contact": "Contact"
   },
   "header": {
-    "registerCta": "Register Now",
+    "registerCta": "Register to Compete",
     "myProfile": "My Profile",
     "signIn": "Sign In",
-    "account": "Account"
+    "account": "Account",
+    "profile": "Profile"
   },
   "mobileNav": {
     "home": "Home",
@@ -23,11 +24,11 @@
     "menu": "Menu"
   },
   "announcement": {
-    "text": "Registration is open for the Championship",
-    "cta": "Secure your spot"
+    "text": "Atlanta, Georgia, USA — July 19–25, 2027",
+    "cta": "Register now"
   },
   "footer": {
-    "tagline": "The international checkers championship — compete, connect, and rise to the top board.",
+    "tagline": "Hopeland Global Checkers (Draughts) Federation — the Global Checkers/Draughts Championship in Atlanta, Georgia, USA, July 19–25, 2027.",
     "sitemapHeading": "Sitemap",
     "exploreHeading": "Explore",
     "legalHeading": "Legal",

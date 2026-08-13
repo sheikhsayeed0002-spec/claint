@@ -87,7 +87,8 @@ function toResult(data: CheckoutApiResponse): CheckoutStartResult | null {
  * Starts Stripe Checkout the same way in local Vite and on Vercel/production:
  * - Dev: optional local Vite plugin, then Edge Function
  * - Prod: Edge Function only
- * - Prefer embedded; if that fails, fall back to hosted Checkout URL
+ * - Dev: embedded Checkout on-site, then hosted URL
+ * - Prod: hosted Stripe Checkout page first (full payment page), then embedded
  */
 export async function startRegistrationCheckout(
   fields: CheckoutRegistrationFields,
@@ -110,22 +111,30 @@ export async function startRegistrationCheckout(
     return null
   }
 
-  try {
-    const embedded = await tryMode('embedded')
-    if (embedded) return embedded
-  } catch (err) {
-    // Embedded can fail on unregistered domains / API mode — try hosted next.
-    const message = err instanceof Error ? err.message : ''
-    if (!/embedded|ui_mode|domain|client.?secret|not enabled/i.test(message) && message) {
-      // Still try hosted once for deploy resilience, unless it's clearly config/auth.
-      if (/not configured|secret key|503|401|403|Invalid registration/i.test(message)) {
-        throw err
+  const preferHosted = !isDevRuntime
+
+  if (!preferHosted) {
+    try {
+      const embedded = await tryMode('embedded')
+      if (embedded) return embedded
+    } catch (err) {
+      // Embedded can fail on unregistered domains / API mode — try hosted next.
+      const message = err instanceof Error ? err.message : ''
+      if (!/embedded|ui_mode|domain|client.?secret|not enabled/i.test(message) && message) {
+        if (/not configured|secret key|503|401|403|Invalid registration/i.test(message)) {
+          throw err
+        }
       }
     }
   }
 
   const hosted = await tryMode('hosted')
   if (hosted) return hosted
+
+  if (preferHosted) {
+    const embedded = await tryMode('embedded')
+    if (embedded) return embedded
+  }
 
   throw new Error('Could not start checkout. Please try again.')
 }
