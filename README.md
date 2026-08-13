@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Hopeland Global Checkers
 
 The official website for the Hopeland Global Checkers World Championship — React + Tailwind CSS + Supabase with a public marketing site, multi-language support, paid Stripe registration, and an admin dashboard.
@@ -117,3 +118,6 @@ backend/
 - Paid registration + Auth account are created only after Stripe confirms payment.
 - Cancelled / declined checkout creates no registration row and no account.
 - Admin requires `profiles.role` of `admin` or `superadmin` when Supabase is connected.
+=======
+# claint
+>>>>>>> 6b9287ed9d5db8e2b82c69f35676cb9abd544e14
