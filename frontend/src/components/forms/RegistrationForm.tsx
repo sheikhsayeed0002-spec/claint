@@ -64,7 +64,8 @@ export function RegistrationForm() {
         throw new Error('Could not start checkout. Please try again.')
       }
 
-      if (!isSupabaseConfigured) {
+      // Local/dev only — never fake a paid registration on the live site.
+      if (!import.meta.env.PROD && !isSupabaseConfigured) {
         await new Promise((resolve) => setTimeout(resolve, 900))
         const registration = await createDemoRegistration.mutateAsync({
           first_name: values.firstName,

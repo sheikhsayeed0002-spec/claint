@@ -25,6 +25,7 @@ export default function RegisterSuccess() {
 
   const [registration, setRegistration] = useState<Registration | null>(() => {
     if (typeof window === 'undefined') return null
+    if (import.meta.env.PROD) return null
     if (new URLSearchParams(window.location.search).get('local') === 'true') {
       return readLocalPaidRegistration()
     }
@@ -32,6 +33,7 @@ export default function RegisterSuccess() {
   })
   const [loading, setLoading] = useState(() => {
     if (typeof window === 'undefined') return true
+    if (import.meta.env.PROD) return true
     if (new URLSearchParams(window.location.search).get('local') === 'true') {
       const local = readLocalPaidRegistration()
       return !(local?.status === 'paid')
@@ -45,6 +47,16 @@ export default function RegisterSuccess() {
     let cancelled = false
 
     void (async () => {
+      // Fake local/demo success is local-only. Live site must have a Stripe session.
+      if (import.meta.env.PROD && (isLocal || isDemo)) {
+        if (!cancelled) {
+          setUnpaid(true)
+          setError('Payment was not completed with Stripe. Please register again.')
+          setLoading(false)
+        }
+        return
+      }
+
       // Intermediate local payment — registration already saved; no Stripe session.
       if (isLocal) {
         const local = readLocalPaidRegistration()
