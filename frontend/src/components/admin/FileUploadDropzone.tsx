@@ -11,9 +11,19 @@ interface FileUploadDropzoneProps {
   currentUrl?: string
   onUploaded: (url: string) => void
   accept?: string
+  hint?: string
+  maxSizeBytes?: number
 }
 
-export function FileUploadDropzone({ bucket, label, currentUrl, onUploaded, accept = 'image/*' }: FileUploadDropzoneProps) {
+export function FileUploadDropzone({
+  bucket,
+  label,
+  currentUrl,
+  onUploaded,
+  accept = 'image/*',
+  hint,
+  maxSizeBytes,
+}: FileUploadDropzoneProps) {
   const inputRef = useRef<HTMLInputElement>(null)
   const [isDragging, setIsDragging] = useState(false)
   const [isUploading, setIsUploading] = useState(false)
@@ -21,6 +31,10 @@ export function FileUploadDropzone({ bucket, label, currentUrl, onUploaded, acce
   const handleFile = useCallback(
     async (file: File | undefined) => {
       if (!file) return
+      if (maxSizeBytes && file.size > maxSizeBytes) {
+        toast.error(`File is too large. Maximum size is ${Math.round(maxSizeBytes / (1024 * 1024))} MB.`)
+        return
+      }
       setIsUploading(true)
       try {
         const url = await uploadFile(bucket, file)
@@ -32,7 +46,7 @@ export function FileUploadDropzone({ bucket, label, currentUrl, onUploaded, acce
         setIsUploading(false)
       }
     },
-    [bucket, onUploaded],
+    [bucket, onUploaded, maxSizeBytes],
   )
 
   return (
@@ -68,7 +82,7 @@ export function FileUploadDropzone({ bucket, label, currentUrl, onUploaded, acce
           <UploadCloud className="text-muted" size={24} />
         )}
         <p className="text-xs text-muted">
-          {isUploading ? 'Uploading…' : 'Drag & drop, or click to browse'}
+          {isUploading ? 'Uploading…' : hint ?? 'Drag & drop, or click to browse'}
         </p>
       </motion.div>
       {currentUrl && (

@@ -118,14 +118,27 @@ export default function VideosManager() {
         <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-5">
           <FormField label="Title" error={errors.title?.message} {...register('title')} />
           <FormField label="Description" error={errors.description?.message} {...register('description')} />
+          <FileUploadDropzone
+            bucket="video-files"
+            label="Upload video file"
+            accept="video/mp4,video/webm,video/ogg,video/quicktime,.mp4,.webm,.mov,.m4v"
+            hint="Drag an MP4 or WebM here, or click to browse (max 100 MB)."
+            maxSizeBytes={100 * 1024 * 1024}
+            currentUrl={
+              /supabase\.co\/storage\/|\/video-files\//i.test(watch('videoUrl') ?? '')
+                ? watch('videoUrl')
+                : undefined
+            }
+            onUploaded={(url) => setValue('videoUrl', url, { shouldValidate: true, shouldDirty: true })}
+          />
           <FormField
-            label="Video URL"
+            label="Or paste a video link"
             placeholder="https://youtube.com/watch?v=… or youtu.be/… or MP4 link"
             error={errors.videoUrl?.message}
             {...register('videoUrl')}
           />
           <p className="text-xs text-muted">
-            Paste a YouTube link (watch / youtu.be / shorts) or a direct MP4 URL. Thumbnail upload is optional.
+            Upload a video file, or paste a YouTube / MP4 link. Either one works — publish to show it on the Videos page.
           </p>
           <FileUploadDropzone
             bucket="videos"

@@ -1,30 +1,53 @@
 import { supabase, isSupabaseConfigured } from '@/lib/supabaseClient'
 
-export type StorageBucket = 'videos' | 'sponsor-logos' | 'blog-covers'
+export type StorageBucket = 'videos' | 'video-files' | 'sponsor-logos' | 'blog-covers'
 
 const DEMO_MAX_FILE_SIZE_BYTES = 2 * 1024 * 1024
+const EDGE_UPLOAD_MAX_BYTES = 4 * 1024 * 1024
+const VIDEO_UPLOAD_MAX_BYTES = 100 * 1024 * 1024
+
+function isVideoFile(file: File): boolean {
+  return file.type.startsWith('video/') || /\.(mp4|webm|ogg|mov|m4v)$/i.test(file.name)
+}
+
+function contentTypeFor(file: File): string | undefined {
+  if (file.type) return file.type
+  if (/\.webm$/i.test(file.name)) return 'video/webm'
+  if (/\.(mov|qt)$/i.test(file.name)) return 'video/quicktime'
+  if (/\.(mp4|m4v)$/i.test(file.name)) return 'video/mp4'
+  return undefined
+}
 
 export async function uploadFile(bucket: StorageBucket, file: File): Promise<string> {
+  if (bucket === 'video-files' && file.size > VIDEO_UPLOAD_MAX_BYTES) {
+    throw new Error('Video is too large. Please upload an MP4 or WebM under 100 MB.')
+  }
+
   if (!isSupabaseConfigured) {
+    if (isVideoFile(file)) {
+      throw new Error('Connect Supabase to upload video files from the admin dashboard.')
+    }
     if (file.size > DEMO_MAX_FILE_SIZE_BYTES) {
       throw new Error('In demo mode, please use an image smaller than 2 MB.')
     }
     return readFileAsDataUrl(file)
   }
 
-  // Prefer edge function (service role) so uploads work even if storage RLS
-  // policies were never applied on the project.
-  const viaFunction = await uploadViaEdgeFunction(bucket, file)
-  if (viaFunction) return viaFunction
+  // Edge Functions reject large bodies — send big videos straight to Storage.
+  if (file.size <= EDGE_UPLOAD_MAX_BYTES) {
+    const viaFunction = await uploadViaEdgeFunction(bucket, file)
+    if (viaFunction) return viaFunction
+  }
 
   const path = `${Date.now()}-${file.name.replace(/[^a-zA-Z0-9.-]/g, '_')}`
   const { error } = await supabase.storage.from(bucket).upload(path, file, {
     cacheControl: '3600',
     upsert: false,
+    contentType: contentTypeFor(file),
   })
   if (error) {
-    // If storage RLS isn't applied yet, keep admin usable with a compact data URL.
     if (
+      !isVideoFile(file) &&
       file.size <= DEMO_MAX_FILE_SIZE_BYTES &&
       /row-level security|rls|violates|policy|permission|not allowed|unauthorized|403|jwt|forbidden/i.test(
         error.message,
@@ -55,9 +78,8 @@ async function uploadViaEdgeFunction(bucket: StorageBucket, file: File): Promise
   )
 
   if (error) {
-    // Function not deployed / network — fall back to direct storage upload.
     const message = error.message ?? ''
-    if (/Failed to send|not found|404|FunctionsRelayError|FunctionsFetchError/i.test(message)) {
+    if (/Failed to send|not found|404|FunctionsRelayError|FunctionsFetchError|payload|too large|413/i.test(message)) {
       return null
     }
     throw new Error(formatStorageError(bucket, message))
@@ -74,10 +96,13 @@ async function uploadViaEdgeFunction(bucket: StorageBucket, file: File): Promise
 
 function formatStorageError(bucket: StorageBucket, message: string): string {
   if (/bucket not found/i.test(message)) {
-    return `Storage bucket "${bucket}" is missing. Run supabase/MEDIA_STORAGE_FIX.sql in the Supabase SQL Editor, then retry.`
+    return `Storage bucket "${bucket}" is missing. Run supabase/VIDEO_UPLOAD_FIX.sql in the Supabase SQL Editor, then retry.`
+  }
+  if (/mime type|not allowed|invalid/i.test(message) && bucket === 'video-files') {
+    return 'Use an MP4 or WebM video file.'
   }
   if (/row-level security|rls|permission|not allowed|unauthorized|403/i.test(message)) {
-    return `Upload blocked for "${bucket}". Run supabase/MEDIA_STORAGE_FIX.sql (storage policies) and confirm your account is admin.`
+    return `Upload blocked for "${bucket}". Run supabase/VIDEO_UPLOAD_FIX.sql (storage policies) and confirm your account is admin.`
   }
   return message
 }

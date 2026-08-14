@@ -9,6 +9,7 @@
 insert into storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
 values
   ('videos', 'videos', true, 5242880, array['image/jpeg', 'image/png', 'image/webp', 'image/gif']),
+  ('video-files', 'video-files', true, 104857600, array['video/mp4', 'video/webm', 'video/ogg', 'video/quicktime', 'video/x-m4v']),
   ('sponsor-logos', 'sponsor-logos', true, 5242880, array['image/jpeg', 'image/png', 'image/webp', 'image/gif', 'image/svg+xml']),
   ('blog-covers', 'blog-covers', true, 5242880, array['image/jpeg', 'image/png', 'image/webp', 'image/gif'])
 on conflict (id) do update set
@@ -20,13 +21,13 @@ on conflict (id) do update set
 drop policy if exists "media_public_read" on storage.objects;
 create policy "media_public_read"
   on storage.objects for select
-  using (bucket_id in ('videos', 'sponsor-logos', 'blog-covers'));
+  using (bucket_id in ('videos', 'sponsor-logos', 'blog-covers', 'video-files'));
 
 drop policy if exists "media_admin_write" on storage.objects;
 create policy "media_admin_write"
   on storage.objects for insert
   with check (
-    bucket_id in ('videos', 'sponsor-logos', 'blog-covers')
+    bucket_id in ('videos', 'sponsor-logos', 'blog-covers', 'video-files')
     and public.is_admin()
   );
 
@@ -34,11 +35,11 @@ drop policy if exists "media_admin_update" on storage.objects;
 create policy "media_admin_update"
   on storage.objects for update
   using (
-    bucket_id in ('videos', 'sponsor-logos', 'blog-covers')
+    bucket_id in ('videos', 'sponsor-logos', 'blog-covers', 'video-files')
     and public.is_admin()
   )
   with check (
-    bucket_id in ('videos', 'sponsor-logos', 'blog-covers')
+    bucket_id in ('videos', 'sponsor-logos', 'blog-covers', 'video-files')
     and public.is_admin()
   );
 
@@ -46,7 +47,7 @@ drop policy if exists "media_admin_delete" on storage.objects;
 create policy "media_admin_delete"
   on storage.objects for delete
   using (
-    bucket_id in ('videos', 'sponsor-logos', 'blog-covers')
+    bucket_id in ('videos', 'sponsor-logos', 'blog-covers', 'video-files')
     and public.is_admin()
   );
 
@@ -130,5 +131,5 @@ create policy "blog_posts_write_admin"
 
 -- Verify
 select id, name, public from storage.buckets
-where id in ('videos', 'sponsor-logos', 'blog-covers')
+where id in ('videos', 'video-files', 'sponsor-logos', 'blog-covers')
 order by id;

@@ -228,6 +228,7 @@ create trigger blog_posts_set_updated_at
 insert into storage.buckets (id, name, public)
 values
   ('videos', 'videos', true),
+  ('video-files', 'video-files', true),
   ('sponsor-logos', 'sponsor-logos', true),
   ('blog-covers', 'blog-covers', true)
 on conflict (id) do nothing;
@@ -235,13 +236,13 @@ on conflict (id) do nothing;
 drop policy if exists "media_public_read" on storage.objects;
 create policy "media_public_read"
   on storage.objects for select
-  using (bucket_id in ('videos', 'sponsor-logos', 'blog-covers'));
+  using (bucket_id in ('videos', 'sponsor-logos', 'blog-covers', 'video-files'));
 
 drop policy if exists "media_admin_write" on storage.objects;
 create policy "media_admin_write"
   on storage.objects for insert
   with check (
-    bucket_id in ('videos', 'sponsor-logos', 'blog-covers')
+    bucket_id in ('videos', 'sponsor-logos', 'blog-covers', 'video-files')
     and public.is_admin()
   );
 
@@ -249,7 +250,7 @@ drop policy if exists "media_admin_update" on storage.objects;
 create policy "media_admin_update"
   on storage.objects for update
   using (
-    bucket_id in ('videos', 'sponsor-logos', 'blog-covers')
+    bucket_id in ('videos', 'sponsor-logos', 'blog-covers', 'video-files')
     and public.is_admin()
   );
 
@@ -257,7 +258,7 @@ drop policy if exists "media_admin_delete" on storage.objects;
 create policy "media_admin_delete"
   on storage.objects for delete
   using (
-    bucket_id in ('videos', 'sponsor-logos', 'blog-covers')
+    bucket_id in ('videos', 'sponsor-logos', 'blog-covers', 'video-files')
     and public.is_admin()
   );
 

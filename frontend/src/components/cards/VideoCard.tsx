@@ -2,8 +2,11 @@ import { motion } from 'framer-motion'
 import { Play } from 'lucide-react'
 import type { Video } from '@/types'
 import { formatDate } from '@/lib/utils'
+import { getPlayableVideo } from '@/lib/videoUrl'
 
 export function VideoCard({ video, onPlay }: { video: Video; onPlay?: (video: Video) => void }) {
+  const playable = getPlayableVideo(video.video_url)
+
   return (
     <motion.button
       type="button"
@@ -14,6 +17,14 @@ export function VideoCard({ video, onPlay }: { video: Video; onPlay?: (video: Vi
       <div className="relative aspect-video overflow-hidden rounded-2xl bg-navy">
         {video.thumbnail_url ? (
           <img src={video.thumbnail_url} alt={video.title} className="absolute inset-0 h-full w-full object-cover" />
+        ) : playable.kind === 'file' ? (
+          <video
+            src={playable.src}
+            muted
+            playsInline
+            preload="metadata"
+            className="absolute inset-0 h-full w-full object-cover"
+          />
         ) : (
           <div className="absolute inset-0 bg-gradient-to-br from-navy-soft to-navy" />
         )}
