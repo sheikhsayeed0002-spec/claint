@@ -5,9 +5,6 @@ import { SectionHeading } from '@/components/common/SectionHeading'
 import { SponsorLogo } from '@/components/cards/SponsorLogo'
 import { LoadingSpinner } from '@/components/common/LoadingSpinner'
 import { Button } from '@/components/common/Button'
-import { SponsorsMarquee } from '@/components/home/SponsorsMarquee'
-import { SponsorsStaticGrid } from '@/components/home/SponsorsStaticGrid'
-import { SponsorsDualCarousel } from '@/components/home/SponsorsDualCarousel'
 import { useSponsors } from '@/hooks/useSponsors'
 import { SITE_NAME, SITE_URL } from '@/lib/seo'
 import type { Sponsor } from '@/types'
@@ -56,23 +53,6 @@ export default function Sponsors() {
               })}
             </div>
           )}
-        </div>
-      </section>
-
-      <section className="bg-[#0099FF] py-16 text-white sm:py-20">
-        <div className="container-page">
-          <p className="text-center text-[11px] font-semibold tracking-[0.22em] text-white/80 uppercase">
-            Official partners
-          </p>
-        </div>
-        <div className="mt-10 overflow-hidden sm:mt-12">
-          <SponsorsMarquee variant="dark" size="feature" photosOnly fadeFrom="from-[#0099FF]" />
-        </div>
-        <div className="container-page mt-8 sm:mt-10">
-          <SponsorsStaticGrid tone="blue" />
-        </div>
-        <div className="mt-8 sm:mt-10">
-          <SponsorsDualCarousel />
         </div>
       </section>
 

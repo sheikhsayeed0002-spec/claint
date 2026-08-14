@@ -7,7 +7,6 @@ import { HeroCube } from '@/components/home/HeroCube'
 import { NetworkBackground } from '@/components/home/NetworkBackground'
 import { SponsorsMarquee } from '@/components/home/SponsorsMarquee'
 import { SponsorsStaticGrid } from '@/components/home/SponsorsStaticGrid'
-import { SponsorsDualCarousel } from '@/components/home/SponsorsDualCarousel'
 import { useAuth } from '@/context/AuthContext'
 import { useRegistrantStore } from '@/store/registrantStore'
 import { fadeUp, floatY, floatYSlow, slideFromLeft, slideFromRight, staggerContainer } from '@/lib/motion'
@@ -148,9 +147,6 @@ export function HeroSection() {
           <SponsorsMarquee variant="dark" compact />
           <div className="mt-6 sm:mt-8">
             <SponsorsStaticGrid tone="navy" />
-          </div>
-          <div className="mt-6 w-full sm:mt-8">
-            <SponsorsDualCarousel tone="navy" />
           </div>
         </div>
       </div>
