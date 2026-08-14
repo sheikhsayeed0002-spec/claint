@@ -15,10 +15,10 @@ export function SponsorsStaticGrid({ className, tone = 'navy' }: SponsorsStaticG
 
   if (list.length === 0) return null
 
-  const card =
+  const emptyCard =
     tone === 'light'
       ? 'border-black/10 bg-white'
-      : 'border-white/20 bg-white shadow-[0_8px_24px_-12px_rgba(0,0,0,0.35)]'
+      : 'border-white/20 bg-white/10'
 
   return (
     <div
@@ -30,11 +30,12 @@ export function SponsorsStaticGrid({ className, tone = 'navy' }: SponsorsStaticG
     >
       {list.map((sponsor) => {
         const href = sponsor.website_url && sponsor.website_url !== '#' ? sponsor.website_url : null
-        const inner = sponsor.logo_url ? (
+        const hasPhoto = Boolean(sponsor.logo_url)
+        const inner = hasPhoto ? (
           <img
             src={sponsor.logo_url}
             alt={sponsor.name}
-            className="max-h-12 w-auto max-w-[85%] object-contain sm:max-h-14"
+            className="absolute inset-0 h-full w-full object-cover"
           />
         ) : (
           <span className="max-w-[90%] truncate px-2 text-center text-sm font-display font-bold text-ink/70">
@@ -43,8 +44,10 @@ export function SponsorsStaticGrid({ className, tone = 'navy' }: SponsorsStaticG
         )
 
         const classNameCard = cn(
-          'flex h-20 items-center justify-center overflow-hidden rounded-xl border sm:h-24',
-          card,
+          'relative h-20 overflow-hidden rounded-xl border sm:h-24',
+          hasPhoto
+            ? 'border-white/15 bg-transparent'
+            : cn('flex items-center justify-center', emptyCard),
         )
 
         if (!href) {
