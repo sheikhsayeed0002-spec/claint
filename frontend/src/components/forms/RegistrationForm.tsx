@@ -48,15 +48,16 @@ export function RegistrationForm() {
         const { password: _password, confirmPassword: _confirm, ...checkoutFields } = values
         const checkout = await startRegistrationCheckout(checkoutFields)
 
+        // Hosted Stripe page first — required on Vercel / any live domain.
+        if ('url' in checkout && checkout.url) {
+          window.location.assign(checkout.url)
+          return
+        }
+
         if ('clientSecret' in checkout && checkout.clientSecret) {
           const { saveCheckoutClientSecret } = await import('@/pages/public/RegisterCheckout')
           saveCheckoutClientSecret(checkout.clientSecret)
           navigate('/register/checkout')
-          return
-        }
-
-        if ('url' in checkout && checkout.url) {
-          window.location.assign(checkout.url)
           return
         }
 

@@ -1,6 +1,13 @@
 /** True only during `vite` / `vite preview` local tooling — false on Vercel builds. */
 export const isDevRuntime = import.meta.env.DEV
 
+/** Localhost / loopback — true for local Vite, false on any deployed host. */
+export function isLocalHost(): boolean {
+  if (typeof window === 'undefined') return false
+  const host = window.location.hostname
+  return host === 'localhost' || host === '127.0.0.1' || host === '[::1]' || host === '::1'
+}
+
 function looksLikePlaceholder(value: string | undefined): boolean {
   if (!value) return true
   const v = value.trim().toLowerCase()

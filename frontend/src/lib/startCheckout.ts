@@ -1,6 +1,6 @@
 import { FunctionsFetchError, FunctionsHttpError, FunctionsRelayError } from '@supabase/supabase-js'
 import { supabase } from '@/lib/supabaseClient'
-import { isDevRuntime } from '@/lib/env'
+import { isLocalHost } from '@/lib/env'
 
 export type CheckoutStartResult =
   | { clientSecret: string; url?: undefined }
@@ -38,23 +38,53 @@ async function readFunctionError(err: unknown): Promise<string | null> {
   return err instanceof Error ? err.message : null
 }
 
+async function invokeViaRawFetch(
+  body: CheckoutRegistrationFields & { uiMode: 'embedded' | 'hosted'; siteUrl: string },
+): Promise<CheckoutApiResponse | null> {
+  const base = (import.meta.env.VITE_SUPABASE_URL || '').replace(/\/$/, '')
+  const key = import.meta.env.VITE_SUPABASE_ANON_KEY || ''
+  if (!base || !key) return null
+  const res = await fetch(`${base}/functions/v1/create-checkout-session`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      apikey: key,
+      Authorization: `Bearer ${key}`,
+    },
+    body: JSON.stringify(body),
+  })
+  const contentType = res.headers.get('content-type') ?? ''
+  if (!contentType.includes('application/json')) return null
+  const data = (await res.json()) as CheckoutApiResponse
+  if (!res.ok) {
+    throw new Error(data.error ?? 'Could not start checkout.')
+  }
+  return data
+}
+
 async function invokeCreateCheckout(
   body: CheckoutRegistrationFields & { uiMode: 'embedded' | 'hosted'; siteUrl: string },
 ): Promise<CheckoutApiResponse> {
   const { data, error } = await supabase.functions.invoke<CheckoutApiResponse>('create-checkout-session', {
     body,
   })
-  if (error) {
-    const message = await readFunctionError(error)
-    throw new Error(message ?? 'Could not start checkout. Please try again.')
+  if (!error) return data ?? {}
+  try {
+    const fallback = await invokeViaRawFetch(body)
+    if (fallback) return fallback
+  } catch (fallbackErr) {
+    if (fallbackErr instanceof Error && fallbackErr.message && !/Failed to fetch|NetworkError/i.test(fallbackErr.message)) {
+      throw fallbackErr
+    }
   }
-  return data ?? {}
+  const message = await readFunctionError(error)
+  throw new Error(message ?? 'Could not start checkout. Please try again.')
 }
 
 async function createViaLocalDevApi(
   body: CheckoutRegistrationFields & { uiMode: 'embedded' | 'hosted'; siteUrl: string },
 ): Promise<CheckoutApiResponse | null> {
-  if (!isDevRuntime) return null
+  if (!isLocalHost()) return null
   try {
     const localRes = await fetch('/api/create-checkout-session', {
       method: 'POST',
@@ -77,64 +107,47 @@ async function createViaLocalDevApi(
   }
 }
 
-function toResult(data: CheckoutApiResponse): CheckoutStartResult | null {
-  if (data.clientSecret) return { clientSecret: data.clientSecret }
+function toResult(data: CheckoutApiResponse, allowEmbedded: boolean): CheckoutStartResult | null {
   if (data.url) return { url: data.url }
+  if (allowEmbedded && data.clientSecret) return { clientSecret: data.clientSecret }
   return null
 }
 
 /**
- * Starts Stripe Checkout the same way in local Vite and on Vercel/production:
- * - Dev: optional local Vite plugin, then Edge Function
- * - Prod: Edge Function only
- * - Dev: embedded Checkout on-site, then hosted URL
- * - Prod: hosted Stripe Checkout page first (full payment page), then embedded
+ * Starts Stripe Checkout the same way locally and on any deployed host:
+ * - Localhost: Vite `/api` plugin first, then Edge Function
+ * - Live/deploy: Edge Function only (hosted Checkout — works on any domain)
+ * - Production never uses embedded Checkout (unregistered domains fail)
  */
 export async function startRegistrationCheckout(
   fields: CheckoutRegistrationFields,
 ): Promise<CheckoutStartResult> {
   const siteUrl = typeof window !== 'undefined' ? window.location.origin.replace(/\/$/, '') : ''
+  const allowEmbedded = isLocalHost()
   const base = { ...fields, siteUrl }
 
   const tryMode = async (uiMode: 'embedded' | 'hosted'): Promise<CheckoutStartResult | null> => {
     const payload = { ...base, uiMode }
     const local = await createViaLocalDevApi(payload)
     if (local) {
-      const fromLocal = toResult(local)
+      const fromLocal = toResult(local, allowEmbedded)
       if (fromLocal) return fromLocal
       if (local.error) throw new Error(local.error)
     }
     const remote = await invokeCreateCheckout(payload)
-    const fromRemote = toResult(remote)
+    const fromRemote = toResult(remote, allowEmbedded)
     if (fromRemote) return fromRemote
     if (remote.error) throw new Error(remote.error)
     return null
   }
 
-  const preferHosted = !isDevRuntime
-
-  if (!preferHosted) {
-    try {
-      const embedded = await tryMode('embedded')
-      if (embedded) return embedded
-    } catch (err) {
-      // Embedded can fail on unregistered domains / API mode — try hosted next.
-      const message = err instanceof Error ? err.message : ''
-      if (!/embedded|ui_mode|domain|client.?secret|not enabled/i.test(message) && message) {
-        if (/not configured|secret key|503|401|403|Invalid registration/i.test(message)) {
-          throw err
-        }
-      }
-    }
-  }
-
   const hosted = await tryMode('hosted')
   if (hosted) return hosted
 
-  if (preferHosted) {
+  if (allowEmbedded) {
     const embedded = await tryMode('embedded')
     if (embedded) return embedded
   }
 
-  throw new Error('Could not start checkout. Please try again.')
+  throw new Error('Could not start Stripe Checkout. Please try again.')
 }

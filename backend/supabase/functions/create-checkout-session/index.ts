@@ -110,7 +110,7 @@ Deno.serve(async (req) => {
     params.set('line_items[0][price_data][unit_amount]', String(feeAmount))
     params.set(
       'line_items[0][price_data][product_data][name]',
-      'Hopeland Global Checkers - Championship Registration',
+      'Hopeland Global Checkers (Draughts) Federation — Championship Registration',
     )
     params.set(
       'line_items[0][price_data][product_data][description]',

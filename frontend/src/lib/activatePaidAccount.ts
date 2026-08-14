@@ -1,6 +1,6 @@
 import { FunctionsHttpError } from '@supabase/supabase-js'
 import { supabase } from '@/lib/supabaseClient'
-import { isDevRuntime } from '@/lib/env'
+import { isLocalHost } from '@/lib/env'
 import { clearPendingAuth, readPendingAuth } from '@/lib/pendingAuth'
 import type { Registration } from '@/types'
 
@@ -16,7 +16,7 @@ async function finalizeViaLocalApi(
   sessionId: string,
   password: string,
 ): Promise<FinalizeResponse | null> {
-  if (!isDevRuntime) return null
+  if (!isLocalHost()) return null
   try {
     const res = await fetch('/api/finalize-paid-registration', {
       method: 'POST',
@@ -43,6 +43,38 @@ async function finalizeViaLocalApi(
   }
 }
 
+async function finalizeViaRawFetch(
+  sessionId: string,
+  password: string,
+): Promise<FinalizeResponse | null> {
+  const base = (import.meta.env.VITE_SUPABASE_URL || '').replace(/\/$/, '')
+  const key = import.meta.env.VITE_SUPABASE_ANON_KEY || ''
+  if (!base || !key) return null
+  const res = await fetch(`${base}/functions/v1/finalize-paid-registration`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      apikey: key,
+      Authorization: `Bearer ${key}`,
+    },
+    body: JSON.stringify({
+      sessionId,
+      password: password.length >= 6 ? password : undefined,
+    }),
+  })
+  const contentType = res.headers.get('content-type') ?? ''
+  if (!contentType.includes('application/json')) return null
+  const data = (await res.json()) as FinalizeResponse
+  if (!res.ok) {
+    return {
+      paid: data.paid,
+      error: data.error ?? 'Could not finalize payment.',
+      registration: data.registration,
+    }
+  }
+  return data
+}
+
 async function finalizeViaEdgeFunction(
   sessionId: string,
   password: string,
@@ -55,6 +87,21 @@ async function finalizeViaEdgeFunction(
   })
 
   if (error) {
+    try {
+      const fallback = await finalizeViaRawFetch(sessionId, password)
+      if (fallback?.paid && fallback.registration) {
+        return { data: fallback, errorMessage: null, unpaid: false }
+      }
+      if (fallback?.error) {
+        return {
+          data: fallback,
+          errorMessage: fallback.error,
+          unpaid: fallback.paid === false || /not completed|not paid|invalid checkout/i.test(fallback.error),
+        }
+      }
+    } catch {
+      // fall through to the original invoke error
+    }
     if (error instanceof FunctionsHttpError) {
       try {
         const body = (await error.context.json()) as FinalizeResponse
