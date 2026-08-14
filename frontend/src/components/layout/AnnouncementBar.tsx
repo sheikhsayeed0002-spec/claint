@@ -1,21 +1,28 @@
 import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router-dom'
-import { ArrowRight } from 'lucide-react'
+import { useAuth } from '@/context/AuthContext'
 
 export function AnnouncementBar() {
   const { t } = useTranslation()
+  const { isPaidPlayer } = useAuth()
 
   return (
-    <div className="relative z-40 overflow-hidden bg-primary text-white">
-      <div className="container-page flex flex-wrap items-center justify-center gap-x-2 gap-y-1 py-2 text-center text-[11px] font-bold sm:text-sm">
-        <span className="min-w-0 max-w-full text-balance sm:truncate">{t('announcement.text')}</span>
-        <Link
-          to="/register"
-          className="inline-flex shrink-0 items-center gap-1 underline underline-offset-2 max-sm:text-[11px]"
-        >
-          {t('announcement.cta')}
-          <ArrowRight size={14} />
-        </Link>
+    <div className="relative z-40 bg-black text-white">
+      <div className="container-page flex items-center justify-center px-3 py-2 text-center">
+        {isPaidPlayer ? (
+          <p className="text-[10px] font-bold tracking-[0.14em] text-white uppercase sm:text-xs">
+            {t('announcement.text')}
+          </p>
+        ) : (
+          <Link
+            to="/register"
+            className="text-[10px] font-bold tracking-[0.14em] text-white uppercase sm:text-xs"
+          >
+            {t('announcement.text')}
+            <span className="mx-2">—</span>
+            {t('announcement.cta')}
+          </Link>
+        )}
       </div>
     </div>
   )

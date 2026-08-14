@@ -8,25 +8,16 @@ import { NetworkBackground } from '@/components/home/NetworkBackground'
 import { SponsorsMarquee } from '@/components/home/SponsorsMarquee'
 import { SponsorsStaticGrid } from '@/components/home/SponsorsStaticGrid'
 import { useAuth } from '@/context/AuthContext'
-import { useRegistrantStore } from '@/store/registrantStore'
 import { fadeUp, floatY, floatYSlow, slideFromLeft, slideFromRight, staggerContainer } from '@/lib/motion'
-
-/** Top chrome ≈ announcement + sticky header; mobile also clears bottom nav. */
-const HERO_MIN_H =
-  'min-h-[calc(100svh-6.5rem)] max-lg:min-h-[calc(100svh-6.5rem-4.25rem-env(safe-area-inset-bottom,0px))]'
 
 export function HeroSection() {
   const { t } = useTranslation('home')
-  const { t: tc } = useTranslation()
   const { isPaidPlayer } = useAuth()
-  const registrantId = useRegistrantStore((s) => s.registrantId)
-  const showProfile = isPaidPlayer || Boolean(registrantId)
-  const profileTo = isPaidPlayer ? '/account' : '/profile'
+  const isRegistered = isPaidPlayer
+  const primaryTo = isRegistered ? '/account' : '/register'
 
   return (
-    <section
-      className={`relative flex ${HERO_MIN_H} flex-col justify-center overflow-x-clip overflow-y-hidden bg-navy text-white max-lg:pb-4`}
-    >
+    <section className="relative overflow-x-clip bg-navy pt-[6.5rem] text-white max-lg:pb-4">
       <div className="pointer-events-none absolute inset-0">
         <img
           src="/home/home-hero-board.png"
@@ -35,13 +26,10 @@ export function HeroSection() {
           draggable={false}
         />
         <NetworkBackground className="h-full w-full opacity-55 mix-blend-screen sm:opacity-65" />
+        <div className="absolute inset-x-0 top-0 h-48 bg-gradient-to-b from-[#38bdf8]/90 via-[#3b82f6]/45 to-transparent" />
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(14,165,233,0.22),transparent_55%)]" />
         <div className="absolute inset-0 bg-gradient-to-r from-navy via-navy/85 to-navy/45" />
-
-        {/* Mid glow — fills vertical space with atmosphere */}
         <div className="absolute inset-x-0 top-1/3 h-1/2 bg-[radial-gradient(ellipse_at_center,rgba(14,165,233,0.18),transparent_65%)]" />
-
-        {/* Bottom lucrative gradient → blends into next section */}
         <div className="absolute inset-x-0 bottom-0 h-[55%] bg-[linear-gradient(180deg,transparent_0%,rgba(14,165,233,0.14)_28%,rgba(3,13,67,0.55)_55%,rgba(7,16,64,0.92)_78%,#f5f6fa_100%)]" />
         <div className="absolute inset-x-0 bottom-0 h-32 bg-[radial-gradient(ellipse_at_50%_100%,rgba(56,189,248,0.35),transparent_70%)]" />
       </div>
@@ -78,7 +66,7 @@ export function HeroSection() {
           </motion.span>
           <motion.h1
             variants={slideFromLeft}
-            className="max-w-4xl font-display font-extrabold tracking-tight text-white text-[clamp(1.65rem,6.2vw,2.5rem)] leading-[1.08] sm:text-display"
+            className="max-w-4xl font-display font-extrabold tracking-tight text-white text-[clamp(1.45rem,5.4vw,2.35rem)] leading-[1.08] sm:text-display"
           >
             {t('hero.title')}
           </motion.h1>
@@ -106,13 +94,14 @@ export function HeroSection() {
             variants={slideFromLeft}
             className="mt-4 flex w-full max-w-md flex-col items-stretch gap-2 sm:mt-7 sm:max-w-none sm:flex-row sm:flex-wrap sm:items-center sm:justify-center sm:gap-4 lg:justify-start"
           >
-            <Link to={showProfile ? profileTo : '/register'} className="min-w-0 sm:flex-none">
+            <Link to={primaryTo} className="min-w-0 sm:flex-none">
               <Button
                 size="md"
-                icon={showProfile ? <UserRound size={16} /> : <ArrowRight size={16} />}
+                icon={isRegistered ? <UserRound size={16} /> : <ArrowRight size={16} />}
+                iconPosition={isRegistered ? 'left' : 'right'}
                 className="w-full px-4 py-2.5 text-sm sm:w-auto sm:px-8 sm:py-4 sm:text-lg"
               >
-                {showProfile ? tc('header.myProfile') : t('hero.ctaPrimary')}
+                {isRegistered ? t('hero.ctaProfile') : t('hero.ctaPrimary')}
               </Button>
             </Link>
             <Link to="/videos" className="min-w-0 sm:flex-none">
@@ -139,15 +128,17 @@ export function HeroSection() {
             <HeroCube />
           </motion.div>
         </motion.div>
+      </div>
 
-        <div className="relative z-10 overflow-hidden border-t border-white/10 pt-3 sm:pt-4 lg:col-span-2 lg:pt-5">
-          <p className="mb-2 text-center text-[10px] font-semibold tracking-[0.18em] text-white/50 uppercase sm:mb-3 sm:text-[11px] sm:tracking-[0.2em]">
-            Official partners
-          </p>
+      <div className="container-page relative z-10 w-full border-t border-white/10 pb-8 pt-4 sm:pb-10 sm:pt-5">
+        <p className="mb-2 text-center text-[10px] font-semibold tracking-[0.18em] text-white/50 uppercase sm:mb-3 sm:text-[11px] sm:tracking-[0.2em]">
+          Official partners
+        </p>
+        <div className="overflow-hidden">
           <SponsorsMarquee variant="dark" compact />
-          <div className="mt-6 sm:mt-8">
-            <SponsorsStaticGrid tone="navy" />
-          </div>
+        </div>
+        <div className="mt-6 sm:mt-8">
+          <SponsorsStaticGrid tone="navy" />
         </div>
       </div>
     </section>

@@ -1,24 +1,10 @@
 import { Helmet } from 'react-helmet-async'
 import { Link } from 'react-router-dom'
-import { PageHero } from '@/components/layout/PageHero'
-import { SectionHeading } from '@/components/common/SectionHeading'
-import { SponsorLogo } from '@/components/cards/SponsorLogo'
-import { LoadingSpinner } from '@/components/common/LoadingSpinner'
+import { SponsorsWall } from '@/components/home/SponsorsWall'
 import { Button } from '@/components/common/Button'
-import { useSponsors } from '@/hooks/useSponsors'
 import { SITE_NAME, SITE_URL } from '@/lib/seo'
-import type { Sponsor } from '@/types'
-
-const tiers: Array<{ key: Sponsor['tier']; label: string }> = [
-  { key: 'platinum', label: 'Platinum Partners' },
-  { key: 'gold', label: 'Gold Partners' },
-  { key: 'silver', label: 'Silver Partners' },
-  { key: 'partner', label: 'Community Partners' },
-]
 
 export default function Sponsors() {
-  const { data: sponsors, isLoading } = useSponsors()
-
   return (
     <>
       <Helmet>
@@ -27,32 +13,18 @@ export default function Sponsors() {
         <link rel="canonical" href={`${SITE_URL}/sponsors`} />
       </Helmet>
 
-      <PageHero eyebrow="OUR PARTNERS" title="Sponsors & Partners" subtitle="The organizations powering every board, broadcast, and prize pool of the championship." />
-
-      <section className="section-y bg-surface-white">
+      <section className="bg-[#0099FF] py-16 text-white sm:py-24">
         <div className="container-page">
-          {isLoading ? (
-            <div className="flex justify-center py-16">
-              <LoadingSpinner size={28} className="text-primary" />
-            </div>
-          ) : (
-            <div className="flex flex-col gap-14">
-              {tiers.map((tier) => {
-                const items = (sponsors ?? []).filter((s) => s.tier === tier.key)
-                if (items.length === 0) return null
-                return (
-                  <div key={tier.key}>
-                    <SectionHeading title={tier.label} align="left" className="mx-0 text-left" />
-                    <div className="mt-8 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
-                      {items.map((sponsor, index) => (
-                        <SponsorLogo key={sponsor.id} sponsor={sponsor} index={index} />
-                      ))}
-                    </div>
-                  </div>
-                )
-              })}
-            </div>
-          )}
+          <p className="text-center text-[11px] font-semibold tracking-[0.22em] text-white/80 uppercase">
+            Our partners
+          </p>
+          <h1 className="text-h1 mt-3 text-center text-white">Sponsors</h1>
+          <p className="text-body-lg mx-auto mt-3 max-w-xl text-center text-white/85">
+            The organizations powering every board, broadcast, and prize pool of the championship.
+          </p>
+          <div className="mt-12 sm:mt-16">
+            <SponsorsWall />
+          </div>
         </div>
       </section>
 

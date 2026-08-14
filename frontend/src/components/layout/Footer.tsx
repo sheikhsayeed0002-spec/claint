@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { Camera, MessageCircle, Play, Send } from 'lucide-react'
 
-export function Footer({ compact = false }: { compact?: boolean }) {
+export function Footer() {
   const { t } = useTranslation()
 
   const sitemapLinks = [
@@ -28,7 +28,7 @@ export function Footer({ compact = false }: { compact?: boolean }) {
   ]
 
   return (
-    <footer className={compact ? 'bg-navy pb-8 text-white/70' : 'bg-navy pb-[calc(5rem+env(safe-area-inset-bottom))] text-white/70 lg:pb-0'}>
+    <footer className="bg-navy pb-[calc(5rem+env(safe-area-inset-bottom))] text-white/70 lg:pb-0">
       <div className="container-page section-y flex flex-col gap-10 lg:flex-row lg:items-start lg:justify-between lg:gap-10">
         <div className="max-w-sm min-w-0">
           <p className="text-h2 font-display font-extrabold text-white">

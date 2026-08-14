@@ -6,6 +6,8 @@
   --color-primary: #0ea5e9;
   --color-primary-light: #38bdf8;
   --color-primary-dark: #071040;
+  --color-header: #3b82f6;
+  --color-header-cta: #60a5fa;
   --color-navy: #071040;
   --color-navy-soft: #0b1a5c;
   --color-surface-light: #f5f6fa;
@@ -29,6 +31,8 @@
   --animate-float: float 6s ease-in-out infinite;
   --animate-marquee: marquee 32s linear infinite;
   --animate-marquee-reverse: marquee-reverse 32s linear infinite;
+  --animate-marquee-down: marquee-down 28s linear infinite;
+  --animate-marquee-up: marquee-up 28s linear infinite;
 
   @keyframes float {
     0%,
@@ -55,6 +59,24 @@
     }
     to {
       transform: translateX(0);
+    }
+  }
+
+  @keyframes marquee-down {
+    from {
+      transform: translateY(0);
+    }
+    to {
+      transform: translateY(-50%);
+    }
+  }
+
+  @keyframes marquee-up {
+    from {
+      transform: translateY(-50%);
+    }
+    to {
+      transform: translateY(0);
     }
   }
 }
@@ -193,4 +215,3 @@
     transform: translateY(0);
   }
 }
-
