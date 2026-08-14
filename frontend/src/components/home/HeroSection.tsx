@@ -6,7 +6,6 @@ import { Button } from '@/components/common/Button'
 import { HeroCube } from '@/components/home/HeroCube'
 import { NetworkBackground } from '@/components/home/NetworkBackground'
 import { SponsorsMarquee } from '@/components/home/SponsorsMarquee'
-import { SponsorsStaticGrid } from '@/components/home/SponsorsStaticGrid'
 import { useAuth } from '@/context/AuthContext'
 import { fadeUp, floatY, floatYSlow, slideFromLeft, slideFromRight, staggerContainer } from '@/lib/motion'
 
@@ -136,9 +135,6 @@ export function HeroSection() {
         </p>
         <div className="overflow-hidden">
           <SponsorsMarquee variant="dark" compact />
-        </div>
-        <div className="mt-6 sm:mt-8">
-          <SponsorsStaticGrid tone="navy" />
         </div>
       </div>
     </section>

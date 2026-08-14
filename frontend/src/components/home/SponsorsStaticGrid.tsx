@@ -23,7 +23,7 @@ export function SponsorsStaticGrid({ className, tone = 'navy' }: SponsorsStaticG
   return (
     <div
       className={cn(
-        'mx-auto grid w-full max-w-5xl grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 md:grid-cols-4 lg:grid-cols-6',
+        'mx-auto grid w-full max-w-3xl grid-cols-2 gap-3 sm:gap-4',
         className,
       )}
       aria-label="Official partners logos"
@@ -44,7 +44,7 @@ export function SponsorsStaticGrid({ className, tone = 'navy' }: SponsorsStaticG
         )
 
         const classNameCard = cn(
-          'relative h-20 overflow-hidden rounded-xl border sm:h-24',
+          'relative h-32 w-full overflow-hidden rounded-xl border sm:h-40',
           hasPhoto
             ? 'border-white/15 bg-transparent'
             : cn('flex items-center justify-center', emptyCard),

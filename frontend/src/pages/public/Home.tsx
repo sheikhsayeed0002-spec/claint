@@ -1,6 +1,7 @@
 import { Helmet } from 'react-helmet-async'
 import { HeroSection } from '@/components/home/HeroSection'
-import { ChampionshipBanner, CHAMPIONSHIP_DATES_ISO, CHAMPIONSHIP_LOCATION } from '@/components/home/ChampionshipBanner'
+import { CHAMPIONSHIP_DATES_ISO, CHAMPIONSHIP_LOCATION } from '@/components/home/ChampionshipBanner'
+import { SponsorsStaticGrid } from '@/components/home/SponsorsStaticGrid'
 import { AboutTeaserSection } from '@/components/home/AboutTeaserSection'
 import { StatsSection } from '@/components/home/StatsSection'
 import { FeaturesSection } from '@/components/home/FeaturesSection'
@@ -43,10 +44,17 @@ export default function Home() {
       </Helmet>
 
       <HeroSection />
-      <ChampionshipBanner />
       <AboutTeaserSection />
       <StatsSection />
       <FeaturesSection />
+      <section className="bg-navy py-12 text-white sm:py-16">
+        <div className="container-page">
+          <p className="mb-6 text-center text-[10px] font-semibold tracking-[0.18em] text-white/50 uppercase sm:mb-8 sm:text-[11px] sm:tracking-[0.2em]">
+            Official partners
+          </p>
+          <SponsorsStaticGrid tone="navy" />
+        </div>
+      </section>
       <VideosPreviewSection />
       <KeyDatesSection />
       <BlogPreviewSection />
