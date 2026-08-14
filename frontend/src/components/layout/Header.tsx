@@ -29,7 +29,6 @@ export function Header() {
   ]
 
   const ctaTo = isPaidPlayer ? '/account' : '/register'
-  const ctaLabel = isPaidPlayer ? t('header.profile') : t('header.registerCta')
 
   return (
     <header
@@ -78,7 +77,7 @@ export function Header() {
             to={ctaTo}
             className="inline-flex items-center justify-center rounded-xl bg-[#60a5fa] px-4 py-2 text-sm font-display font-bold text-white shadow-[0_4px_16px_rgba(37,99,235,0.35)] transition-colors hover:bg-[#93c5fd] sm:rounded-2xl sm:px-6 sm:py-2.5 sm:text-base"
           >
-            {ctaLabel}
+            Dashboard
           </Link>
           <button
             onClick={toggleMobileMenu}
