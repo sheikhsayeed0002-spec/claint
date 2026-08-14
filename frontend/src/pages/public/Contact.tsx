@@ -7,6 +7,7 @@ import { PageHero } from '@/components/layout/PageHero'
 import { FormField } from '@/components/forms/FormField'
 import { Button } from '@/components/common/Button'
 import { SITE_NAME, SITE_URL } from '@/lib/seo'
+import { ORGANIZATION_ADDRESS } from '@/components/home/ChampionshipBanner'
 
 export default function Contact() {
   const [submitting, setSubmitting] = useState(false)
@@ -47,8 +48,14 @@ export default function Contact() {
                 <MapPin size={18} />
               </span>
               <div>
-                <p className="text-sm font-bold text-ink">Organizing Committee</p>
-                <p className="text-sm text-muted">Hopeland Global Checkers, International Office</p>
+                <p className="text-sm font-bold text-ink">Address</p>
+                <address className="not-italic">
+                  {ORGANIZATION_ADDRESS.map((line) => (
+                    <p key={line} className="text-sm text-muted">
+                      {line}
+                    </p>
+                  ))}
+                </address>
               </div>
             </div>
           </div>

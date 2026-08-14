@@ -1,10 +1,11 @@
 import { Helmet } from 'react-helmet-async'
 import { motion } from 'framer-motion'
-import { Globe2, ShieldCheck, Trophy, Users } from 'lucide-react'
+import { Globe2, MapPin, ShieldCheck, Trophy, Users } from 'lucide-react'
 import { PageHero } from '@/components/layout/PageHero'
 import { SectionHeading } from '@/components/common/SectionHeading'
 import { Card } from '@/components/common/Card'
 import { SITE_NAME, SITE_URL } from '@/lib/seo'
+import { CHAMPIONSHIP_DATES, ORGANIZATION_ADDRESS } from '@/components/home/ChampionshipBanner'
 
 const pillars = [
   { icon: Globe2, title: 'Global Reach', text: 'Regional qualifiers run across five continents and feed directly into the World Championship bracket.' },
@@ -71,6 +72,25 @@ export default function About() {
               <p className="mt-2 text-sm text-muted">{division.text}</p>
             </motion.div>
           ))}
+        </div>
+      </section>
+
+      <section className="section-y bg-surface-white">
+        <div className="container-page">
+          <SectionHeading eyebrow="LOCATION" title="Address" />
+          <div className="mx-auto mt-10 flex max-w-xl items-start gap-4 rounded-2xl border border-black/5 bg-white p-6 shadow-card sm:p-8">
+            <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
+              <MapPin size={22} />
+            </span>
+            <address className="not-italic">
+              {ORGANIZATION_ADDRESS.map((line) => (
+                <p key={line} className="text-sm font-semibold text-ink sm:text-base">
+                  {line}
+                </p>
+              ))}
+              <p className="mt-2 text-sm text-muted">Championship venue · {CHAMPIONSHIP_DATES}</p>
+            </address>
+          </div>
         </div>
       </section>
     </>
